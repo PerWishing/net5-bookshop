@@ -1,0 +1,126 @@
+﻿
+@inject IAuthorizationService authService
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="~/lib/bulma/css/bulma.css" rel="stylesheet" />
+    <title>@ViewData["Title"] - BookShop.UI</title>
+</head>
+<body>
+    <div class="container">
+        <h2 class="title has-text-centered">Страница пользователя</h2>
+
+        <div class="container">
+            <div class="columns">
+                <div id="appMessForLay" class="column is-3">
+                    
+                    <div class="menu">
+                        @if ((await authService.AuthorizeAsync(User, "Manager")).Succeeded)
+                        {
+                            <p class="menu-label">Меню пользователя</p>
+                            <ul class="menu-list">
+                                <li><a asp-page="/User/Index">Мои продукты</a></li>
+                                <li><a asp-page="/Favorites">Избранное</a></li>
+                                <li><a asp-page="/User/OrderManagementForCustomer">Мои заказы</a></li>
+                                <li><a asp-page="/User/OrderManagement">Мои продажи</a></li>
+                                <li><a asp-page="/User/CreateProduct">Создать объявление</a></li>
+                                <li><a asp-page="/User/Archive">Архив заказов</a></li>
+                                <li><a asp-page="/PublicUser" asp-route-name="@User.Identity.Name">Моя публичная страница</a></li>
+                                <li><a asp-page="/User/MessageManager">Сообщения 
+                                    <input v-if="messages!=0" id="mesCount" 
+                                           class="button" type="button"
+                                           v-bind:value="messages" readonly/></a> </li>
+                                
+                            </ul>
+                        }
+                        @if ((await authService.AuthorizeAsync(User, "Admin")).Succeeded)
+                        {
+                            <p class="menu-label">Admin Menu</p>
+                            <ul class="menu-list">
+                                <li><a asp-page="/Admin/ConfigureUsers">Создать администратора</a></li>
+                            </ul>
+                        }
+
+                    </div>
+                </div>
+                <div class="column is-7">
+                    @RenderBody()
+                </div>
+                <div class="column is-2 has-background-link-light">
+                    <div id="usersApp" class="container">
+
+                        <div class="pt-4 pl-0 column field has-addons">
+                            <div class="pl-0 control  column is-12">
+                                <input @@change="getUsersBySearch" v-model="search" class="input is-info" placeholder="Поиск" />
+                            </div>
+                        </div>
+
+                        <table class="table">
+                            <tr v-for="user in users">
+                                <td>
+                                    <a v-bind:href="'/PublicUser/'+ user.username">{{user.username}}</a>
+                                </td>
+                                <td>
+                                    <div v-if="user.avatar">
+
+                                        <img v-bind:src="`${user.avatar}`" />
+                                    </div>
+                                    <div v-else>
+                                        <img src="~/images/user-pic.jpg" />
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                        <button v-if="page >1" class="button is-link is-small mr-6" @@click="decPage">Назад</button>
+
+                        <button v-if="users.length >2" class="button is-link is-small ml-5" @@click="incPage">Вперед</button>
+                    </div>
+
+
+                    @section scripts{
+                        <script src="https://unpkg.com/vue@next"></script>
+                        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+                        <script src="~/js/user/users.js"></script>
+                    }
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chat")
+            .build();
+        
+        
+        connection.on("Receive", function (message, to) {
+            console.log("я работаю");
+
+            var v = document.getElementById("mesCount").value;
+            v++;
+            document.getElementById("mesCount").value = v;
+
+
+            console.log("я ещё работаю");
+        });
+
+        connection.start();
+    </script>
+
+
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="~/js/user/messagesForLayout.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+    </html>

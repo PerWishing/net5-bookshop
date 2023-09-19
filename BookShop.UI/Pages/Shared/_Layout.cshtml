@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="~/lib/bulma/css/bulma.css" rel="stylesheet" />
+    <title>@ViewData["Title"] - BookShop.UI</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <nav class="navbar" role="navigation" aria-label="main navigation" style="min-height: unset; height: 30px; z-index:2">
+
+        <div class="navbar-menu is-size-7 has-background-link-light">
+            <div class="navbar-brand">
+
+                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarInfo">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            <div id="navbarInfo" class="navbar-menu">
+                <div class="navbar-start" style="margin-left: 10%;">
+                    <a class="navbar-item" asp-page="">Обратная связь</a>
+                    <div class="navbar-item has-dropdown is-hoverable">
+                        <a class="navbar-link">
+                            Ответы на вопросы
+                        </a>
+
+                        <div class="navbar-dropdown">
+                            <a class="navbar-item">
+                                Как купить?
+                            </a>
+                            <a class="navbar-item">
+                                Как продать?
+                            </a>
+                            <a class="navbar-item">
+                                Зачем регистрироваться?
+                            </a>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="navbar-end">
+
+
+
+                </div>
+            </div>
+        </div>
+    </nav>
+    <nav class="navbar has-shadow" role="navigation" aria-label="main navigation" style="margin-left: 10%; margin-right: 10%; z-index: 1 ">
+
+        <div class="navbar-brand mr-6">
+            <a class="navbar-item " asp-page="/Index">
+                <img src="~/images/logo.png" style="max-height: 70px;">
+
+            </a>
+
+
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu">
+
+            <form asp-page="/index" method="POST">
+                <div class="pt-4 pl-0 column field has-addons">
+                    <div class="pl-0 control  column is-12">
+                        <input class="input is-info" type="text" name="search" id="search" placeholder="Введите текст для поиска..." />
+
+                    </div>
+                    <div class="control  column is-2">
+                        <input class="button is-link" type="submit" value="Поиск" />
+                    </div>
+                </div>
+            </form>
+
+                <div class="navbar-end">
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+
+                        <div class="navbar-item">
+
+                            <a class="navbar-item" asp-page="/User/Index">
+                                <div id="appMessForMain">
+                                    <img src="~/images/user-icon.png" id="userIcon" style="margin-right:5px;">
+
+                                </div>
+                                @User.Identity.Name
+                            </a>
+                        </div>
+
+
+                        <div class="navbar-item">
+                            <a class="navbar-item" asp-page="/Favorites" id="cart-nav">
+                                <img src="~/images/heart.png" style="margin-right:5px; width:24px">
+                                Избранное
+                            </a>
+                        </div>
+                        <div class="navbar-item">
+                            <a class="navbar-item" asp-controller="Account" asp-action="Logout">Выйти</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="navbar-item">
+                            <a class="navbar-item" asp-page="/Accounts/Login">Вход</a>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+    </nav>
+
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <div class="section pb-2 pt-3" style="background-color: #eff1fa; position: relative; bottom: 0px; height: auto;  width: 100%;">
+        <div>
+            <p class="is-size-5">
+                Контакты:
+            </p>
+            <p class=" ">
+                Email:a@a.com
+            </p>
+            <p class=" ">
+                Телефон:81234567890
+            </p>
+            <p class=" ">
+                Vk:vk.com/name
+            </p>
+        </div>
+    </div>
+
+
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        const conn = new signalR.HubConnectionBuilder()
+            .withUrl("/chat")
+            .build();
+
+
+        conn.on("Receive", function (message, to) {
+            console.log("я работаю");
+            document.getElementById("userIcon").src = "/images/icon-noty.png";
+
+            console.log("я ещё работаю");
+        });
+
+        conn.start();
+    </script>
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="~/js/user/messagesForMain.js"></script>
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

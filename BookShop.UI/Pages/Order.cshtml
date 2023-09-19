@@ -1,0 +1,556 @@
+﻿@page "{id}"
+@model BookShop.UI.Pages.OrderModel
+@inject IAuthorizationService authService
+@{
+}
+
+
+<div class="hero">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-6" style="width: 300px;">
+                    <figure class="image is-3by4">
+                        @if (Model.Order.Product.Image != null)
+                        {
+                            <img src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.Order.Product.Image))" />
+                        }
+                        else
+                        {
+                            <img src="~/images/item.jpg" />
+                        }
+                    </figure>
+                </div>
+                <div class="column is-4">
+                    <section class="content">
+                        <p class="title">@Model.Order.Product.Name</p>
+                        <p class="subtitle">Автор: @Model.Order.Product.Author</p>
+                        <p class="">Цена: @Model.Order.Product.Value</p>
+                        <p class="">Жанр: @Model.Order.Product.Genre</p>
+                        <p class="">Издание: @Model.Order.Product.Publishing</p>
+                        <p class="">Год: @Model.Order.Product.Year</p>
+                        <p class="">Серия: @Model.Order.Product.Series</p>
+                        <p class="">ISBN: @Model.Order.Product.ISBN</p>
+                        <footer>
+                        </footer>
+                    </section>
+                </div>
+                <div class="column is-6">
+
+                    <section class="content">
+                        <div id="appOrd" class="field">
+                            <form method="post">
+                                @if (Model.Order.Seller == User.Identity.Name)
+                                {
+                                    <p class="title">Информация о покупателе</p>
+
+                                }
+                                @if (Model.Order.Customer == User.Identity.Name)
+                                {
+                                    <p class="title">Информация вашего заказа</p>
+                                }
+                                <p class="subtitle">
+                                    Продавец:
+                                    <a asp-page="/PublicUser" asp-route-name="@Model.Order.Seller">@Model.Order.Seller</a>
+                                </p>
+                                <p class="subtitle">
+                                    Покупатель:
+                                    <a asp-page="/PublicUser" asp-route-name="@Model.Order.Customer">@Model.Order.Customer</a>
+                                </p>
+                                <p class="">ФИО покупателя: @Model.Order.FIO</p>
+                                <p class="">Адрес покупателя: @Model.Order.Adress1 г. @Model.Order.City</p>
+                                <p class="">Телефон покупателя: @Model.Order.PhoneNumber</p>
+                                <p class="">Код почты: @Model.Order.PostCode</p>
+                                <p class="">Трек-номер: @Model.Order.TrackNumber</p>
+                                <p>
+                                    Статус заказа у покупателя @if (Model.Order.Customer == User.Identity.Name)
+                                    {<span class="has-text-link-dark">(Вы)</span>} :
+                                    @switch ((int)Model.Order.StatusForCustomer)
+                                    {
+                                        case 0:
+                                            <span class="has-text-danger">Не получен</span>
+
+                                            break;
+                                        case 1:
+                                            <span class="has-text-success">Получен</span>
+
+                                            break;
+                                        case 2:
+                                            <span class="has-text-warning">Изменён</span>
+
+                                            break;
+                                        case 3:
+                                            <span class="has-text-danger">Отменён</span>
+
+                                            break;
+                                        default:
+                                            <span class="has-text-danger">@Model.Order.StatusForCustomer</span>
+                                            break;
+                                    }
+                                </p>
+
+                                <p class="">
+                                    Статус заказа у продавца @if (Model.Order.Seller == User.Identity.Name)
+                                    {<span class="has-text-link-dark">(Вы)</span>}:
+                                    @switch ((int)Model.Order.StatusForSeller)
+                                    {
+                                        case 0:
+                                            <span class="has-text-black">Нет статуса</span>
+
+                                            break;
+                                        case 1:
+                                            <span class="has-text-success">Принят</span>
+
+                                            break;
+                                        case 2:
+                                            <span class="has-text-link">Отправлен</span>
+
+                                            break;
+                                        case 3:
+                                            <span class="has-text-success">Деньги получены</span>
+
+                                            break;
+                                        case 4:
+                                            <span class="has-text-danger">Отменён</span>
+
+                                            break;
+                                        default:
+                                            <span class="has-text-danger">@Model.Order.StatusForSeller</span>
+                                            break;
+                                    }
+                                </p>
+                                @if ((await authService.AuthorizeAsync(User, "Admin")).Succeeded)
+                                {
+                                    <div class="field">
+                                        <div class="control">
+                                            <a class="button is-link" asp-page="UpdateOrder" asp-route-id="@Model.Order.Id">Редактировать</a>
+                                        </div>
+                                    </div>
+                                    <p class="control">
+                                        <label>Статус Открыт(0)/Закрыт(1)</label>
+                                        <input class="" type="text" name="status" />
+                                        <input class="button is-link ml-4" type="submit" asp-page-handler="ForAdminStatusClosed"
+                                               value="Изменить статус" />
+                                    </p>
+                                    <p class="control">
+                                        <label>Статус Продавца:Нет статуса(0),Принят(1)</label>
+                                        <label>Отправлен(2), Получены деньги(3), Отменён(4)</label>
+                                        <input class="" type="text" name="status1" />
+                                        <input class="button is-link ml-4" type="submit" asp-page-handler="ForAdminStatusSeller"
+                                               value="Изменить статус" />
+                                    </p>
+                                    <p class="control">
+                                        <label>Статус Покупателя:Не получен(0),Получен(1)</label>
+                                        <label>Отменён(3), Отменён на почте(4)</label>
+                                        <input class="" type="text" name="status2" />
+                                        <input class="button is-link ml-4" type="submit" asp-page-handler="ForAdminStatusCustomer"
+                                               value="Изменить статус" />
+                                    </p>
+                                    foreach (var r in Model.ReviewResponse)
+                                    {
+                                        <section class="content">
+
+                                            <div class="field">
+                                                <p class="">
+                                                    ID: @r.Id
+                                                </p>
+                                                @if (r.PositiveOrNegative == 0)
+                                                {
+                                                    <p class="has-text-success">
+                                                        Положительный
+                                                    </p>
+                                                }
+                                                @if (r.PositiveOrNegative == 1)
+                                                {
+                                                    <p class="has-text-danger">
+                                                        Отрицательный
+                                                    </p>
+                                                }
+                                                <p class="">
+                                                    Отправитель:
+                                                    <a asp-page="/PublicUser" asp-route-name="@r.Sender">@r.Sender</a>
+                                                </p>
+                                                <p class="">
+                                                    Получатель:
+                                                    <a asp-page="/PublicUser" asp-route-name="@r.Recipient">@r.Recipient</a>
+                                                </p>
+
+                                                <label class="label">
+                                                    Отзыв:
+                                                </label>
+                                            </div>
+                                            <div class="field">
+                                                <p>
+                                                    @r.Text
+                                                </p>
+
+                                            </div>
+
+                                        </section>
+                                    }
+                                    <input type="number" name="revId" />
+                                    <input class="button is-danger ml-3" type="submit" asp-page-handler="ForAdminDeleteReview"
+                                           value="Удалить" />
+                                }
+                                @if (Model.Order.Customer == User.Identity.Name)
+                                {
+
+                                    @if ((int)Model.Order.StatusForSeller == 0 && (int)Model.Order.StatusForCustomer != 3)
+                                    {
+                                        <p class="has-text-link">
+                                            Пока продавец не принял ваш заказ вы можете его редактировать или безнаказанно отменить.
+                                            Если вам нужно внести корректировки в заказ, который принят, вам следует связаться с продавцом
+                                            через его контактные данные.
+                                        </p>
+
+                                        <div class="field">
+                                            <div class="control">
+                                                <a class="button is-link" asp-page="UpdateOrder" asp-route-id="@Model.Order.Id">Редактировать</a>
+                                            </div>
+                                        </div>
+                                        <p class="control">
+                                            <div v-if="!editingCanForCustomer">
+                                                <input class="button is-danger" type="button" @@click="cancelProductForCustomer" value="Отменить заказ" />
+                                            </div>
+                                            <div v-if="editingCanForCustomer">
+                                                <span class="">Вы действительно хотите отменить заказ?</span>
+                                                <input class="button is-success" type="submit" asp-page-handler="ForCustomerCancel"
+                                                       value="Да" onclick="sendNotyToHub('@Model.Order.Seller', @Model.Order.Id);" />
+                                                <input class="button is-danger" type="button" @@click="cancelCanForCustomer" value="Нет" />
+                                            </div>
+                                        </p>
+                                    }
+                                    @if ((int)Model.Order.StatusForSeller == 1 && (int)Model.Order.StatusForCustomer != 3)
+                                    {
+                                        <p class="has-text-success">
+                                            Продавец принял ваш заказ.
+                                        </p>
+                                        <p class="has-text-link">
+                                            Когда продавец отправит заказ, вам станет виден трек-код.
+                                        </p>
+
+                                        <p class="">
+                                            Если вам нужно внести корректировки в заказ, который принят, вам следует связаться с продавцом
+                                            через его контактные данные.
+                                        </p>
+
+                                        <p class="control">
+                                            <div v-if="!editingCanForCustomer">
+                                                <input class="button is-danger" type="button" @@click="cancelProductForCustomer" value="Отменить заказ" />
+                                            </div>
+                                            <div v-if="editingCanForCustomer">
+                                                <span class="">Вы действительно хотите отменить заказ?</span>
+                                                <p class="has-text-danger">
+
+                                                    ВНИМАНИЕ! Если вы отмените заказ на этой стадии,
+                                                    продавец будет в праве написать на вас отрицательный отзыв.
+
+                                                </p>
+                                                <input class="button is-success" type="submit" asp-page-handler="ForCustomerCancel"
+                                                       value="Да" onclick="sendNotyToHub('@Model.Order.Seller', @Model.Order.Id);" />
+                                                <input class="button is-danger" type="button" @@click="cancelCanForCustomer" value="Нет" />
+                                            </div>
+                                        </p>
+                                    }
+                                    @if ((int)Model.Order.StatusForSeller == 2 && (int)Model.Order.StatusForCustomer == 0)
+                                    {
+                                        <p class="has-text-link">
+                                            Продавец отправил вам заказ,
+                                            в случае возникновение вопросов обратитесь
+                                            к нему через контактные данные.
+                                        </p>
+
+                                        <p class="control">
+                                            <div v-if="!editingRecForCustomer">
+                                                <input class="button is-success" type="button" @@click="receiveProductForCustomer" value="Я получил посылку" />
+                                            </div>
+                                            <div v-else>
+                                                <span class="is-danger">Вы действительно получили товар?</span>
+                                                <input class="button is-success" type="submit" asp-page-handler="ForCustomerReceive"
+                                                       value="Да" onclick="sendNotyToHub('@Model.Order.Seller', @Model.Order.Id);" />
+                                                <input class="button is-danger" type="button" @@click="cancelRecForCustomer" value="Нет" />
+                                            </div>
+                                        </p>
+                                        <p class="control">
+                                            <div v-if="!editingCanForCustomer">
+                                                <input class="button is-danger" type="button" @@click="cancelProductForCustomer" value="Отменить заказ" />
+                                            </div>
+                                            <div v-if="editingCanForCustomer">
+                                                <span class="">Вы действительно хотите отменить заказ?</span>
+                                                <p class="has-text-danger">
+
+                                                    ВНИМАНИЕ! Если вы отмените заказ на этой стадии,
+                                                    продавец будет в праве написать на вас отрицательный отзыв.
+
+                                                </p>
+                                                <input class="button is-success" type="submit" asp-page-handler="ForCustomerCancel"
+                                                       value="Да" onclick="sendNotyToHub('@Model.Order.Seller', @Model.Order.Id);" />
+                                                <input class="button is-danger" type="button" @@click="cancelCanForCustomer" value="Нет" />
+                                            </div>
+                                        </p>
+                                        <p class="control">
+                                            <input class="button is-link" type="button" @@click="cancelRecForCustomer" value="Товар не соответствует описанию" />
+                                        </p>
+                                    }
+                                    @if ((int)Model.Order.StatusForSeller == 2 && (int)Model.Order.StatusForCustomer == 1)
+                                    {
+                                        <p class="has-text-link">
+                                            Продавец ещё не получил денег. Заказ будет закрыт, когда продавец подтвердит их получение.
+                                        </p>
+
+                                    }
+                                    @if ((int)Model.Order.StatusForSeller == 3 && (int)Model.Order.StatusForCustomer == 1)
+                                    {
+                                        <p class="has-text-success">
+                                            Продавец получил деньги, заказ закрыт.
+                                            Вы можете оставить отзыв о продавце.
+                                        </p>
+                                        <p class="has-text-success">
+                                            Дата закрытия заказа: @Model.Order.DateOfClosing.ToShortDateString()
+                                        </p>
+
+                                        <div class="field">
+                                            <div class="control">
+                                                <a class="button is-success" asp-page="/Review" asp-route-id="@Model.Order.Id">Отзыв</a>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if ((int)Model.Order.StatusForSeller == 4)
+                                    {
+                                        <p class="has-text-danger">
+                                            К сожалению, продавец отменил заказ. Дата отмены: @Model.Order.DateOfClosing.ToShortDateString()
+                                        </p>
+                                        <p>
+                                            Комментарий продавца:
+                                        </p>
+                                        <p>
+                                            "@Model.Order.CommentOfCancel"
+                                        </p>
+
+                                    }
+                                    @if ((int)Model.Order.StatusForCustomer == 3)
+                                    {
+                                        <p class="has-text-link">
+                                            Вы отменили заказ.
+                                        </p>
+                                        <p class="has-text-link">
+                                            Дата отмены: @Model.Order.DateOfClosing.ToShortDateString()
+                                        </p>
+                                    }
+
+                                    <input type="button" class="button" onclick="history.go(-1)" value="Назад" />
+                                }
+
+
+                                @if (Model.Order.Seller == User.Identity.Name)
+                                {
+
+                                    @if ((int)Model.Order.StatusForSeller == 0 && (int)Model.Order.StatusForCustomer != 3)
+                                    {
+
+                                        <input class="button is-success" type="submit" asp-page-handler="ForSellerAccept"
+                                               value="Принять заказ" onclick="sendNotyToHub('@Model.Order.Customer', @Model.Order.Id);" />
+
+
+
+
+                                    }
+                                    @if (((int)Model.Order.StatusForSeller == 1 || (int)Model.Order.StatusForSeller == 2)
+&& (int)Model.Order.StatusForCustomer == 3)
+                                    {
+                                        <p class="has-text-danger">
+                                            К сожалению покупатель отменил заказ. Дата отмены: @Model.Order.DateOfClosing.ToShortDateString()
+                                        </p>
+                                        <p class="has-text-link">
+                                            Вы можете написать ему отрицательный отзыв.
+                                        </p>
+                                        <div class="field">
+                                            <div class="control">
+                                                <a class="button is-link" asp-page="/Review" asp-route-id="@Model.Order.Id">Отзыв</a>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if ((int)Model.Order.StatusForSeller == 1 && (int)Model.Order.StatusForCustomer != 3)
+                                    {
+
+
+                                    }
+                                    @if ((int)Model.Order.StatusForSeller == 2 && (int)Model.Order.StatusForCustomer == 0)
+                                    {
+                                        <p class="has-text-link">
+                                            Покупатель пока не получил посылку.
+                                        </p>
+
+                                        <input class="button is-warning" type="submit" asp-page-handler="ForSellerAccept"
+                                               value="Отменить отправку заказа" onclick="sendNotyToHub('@Model.Order.Customer', @Model.Order.Id);" />
+
+                                    }
+                                    @if ((int)Model.Order.StatusForSeller == 2 && (int)Model.Order.StatusForCustomer == 1)
+                                    {
+                                        <p class="has-text-success">
+                                            Покупатель получил посылку.
+                                        </p>
+
+                                        <input class="button is-success" type="submit" asp-page-handler="ForSellerRecMoney"
+                                               value="Я получил деньги" onclick="sendNotyToHub('@Model.Order.Customer', @Model.Order.Id);" />
+                                    }
+                                    @if ((int)Model.Order.StatusForSeller == 3 && (int)Model.Order.StatusForCustomer == 1)
+                                    {
+
+                                        <p class="has-text-success">
+                                            Заказ закрыт. Вы можете оставить отзыв о покупателе.
+                                        </p>
+                                        <p class="has-text-success">
+                                            Дата закрытия заказа: @Model.Order.DateOfClosing.ToShortDateString()
+                                        </p>
+
+                                        <div class="field">
+                                            <div class="control">
+                                                <a class="button is-success" asp-page="/Review" asp-route-id="@(Model.Order.Id)">Отзыв</a>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if ((int)Model.Order.StatusForSeller != 3 && (int)Model.Order.StatusForCustomer != 3)
+                                    {
+
+                                        <p class="control">
+                                            <div v-if="!cancelingOrderForSeller">
+                                                <input class="button is-danger" type="button" @@click="setTrueCancelingOrderForSeller" value="Отменить заказ" />
+                                            </div>
+                                            <div v-else>
+                                                <p>Комментарий к отмене заказа:</p>
+                                                <textarea id="@Html.IdFor(m => m.CommentOfCancel.Comment)" name="@Html.NameFor(m => m.CommentOfCancel.Comment)"></textarea>
+
+                                                <p>
+                                                    <span class="is-danger">Вы действительно хотите отменить заказ?</span>
+                                                </p>
+                                                <input class="button is-success" type="submit" asp-page-handler="ForSellerCancel"
+                                                       value="Да" onclick="sendNotyToHub('@Model.Order.Customer', @Model.Order.Id);" />
+                                                <input class="button is-danger" type="button" @@click="setFalseCancelingOrderForSeller" value="Нет" />
+                                            </div>
+                                            <span asp-validation-for="@Model.CommentOfCancel.Comment"></span>
+                                        </p>
+                                    }
+                                    @if ((int)Model.Order.StatusForSeller == 4)
+                                    {
+                                        <p class="has-text-link">
+                                            Вы отменили заказ.
+                                        </p>
+                                        <p class="">
+                                            Ваш комментарий: Дата отмены: @Model.Order.DateOfClosing.ToShortDateString()
+                                        </p>
+                                        <p>
+                                            "@Model.Order.CommentOfCancel"
+                                        </p>
+
+                                    }
+                                }
+                            </form>
+                        </div>
+                        @if ((int)Model.Order.StatusForSeller == 1 && (int)Model.Order.StatusForCustomer != 3
+                   && Model.Order.Seller == User.Identity.Name)
+                        {
+                            <form method="post" enctype="multipart/form-data">
+                                <input class="button is-warning" type="submit" asp-page-handler="ForSellerNoStatus"
+                                       value="Отменить принятие заказа" onclick="sendNotyToHub('@Model.Order.Customer', @Model.Order.Id);" />
+
+                                <div class="field">
+                                    <p class="control">
+                                        <label class="label">Трек-номер</label>
+                                        <input asp-for="@Model.TrackNumInfo.TrackNum" value="" />
+                                    </p>
+                                    <span class="has-text-danger" asp-validation-for="@Model.TrackNumInfo.TrackNum"></span>
+                                </div>
+                                <div class="field" id="app">
+                                    <p class="control">
+                                        <label class="label">Опись вложения</label>
+                                    </p>
+                                    <div id="preview">
+                                        <img v-if="url" :src="url" />
+                                    </div>
+                                    <input name="image" type="file" @@change="onFileChange" />
+                                    <input class="button is-link" type="submit" asp-page-handler="ForSellerSend"
+                                           value="Заказ отправлен" onclick="sendNotyToHub('@Model.Order.Customer', @Model.Order.Id);" />
+                                </div>
+                            </form>
+                        }
+                        @if (Model.Order.Seller == User.Identity.Name || (await authService.AuthorizeAsync(User, "Admin")).Succeeded)
+                        {
+
+                            @if (Model.Order.SellerImage != null)
+                            {
+                                <div class="column" style="max-width:600px;">
+                                    <label>Опись вложения</label>
+                                    <figure class="image">
+
+                                        <img src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.Order.SellerImage))" />
+
+                                    </figure>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="has-text-danger">
+                                    ВНИМАНИЕ! При отправлении описи вложения скройте личные данные.
+                                </p>
+                            }
+                        }
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="~/js/user/orders.js"></script>
+    <script src="~/js/user/image.js"></script>
+    
+
+    <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+
+    <script>
+       
+
+        const hubConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/chat")
+            .build();
+
+        hubConnection.on("ReceiveNotyOrder", function (e) {
+            console.log("я обновляю страницу");
+            setTimeout(function () {
+                window.location.reload(true);
+            }, 800);
+            
+        });
+        
+        function sendNotyToHub(to, orderId) {
+            var message = "Статус заказа - " + orderId + " изменён";
+            var messageModel = {
+                id: 0,        
+                text: ""  
+            };
+           
+            console.log("Аргумент:" + to);
+            messageModel.text = message;
+            console.log(messageModel.text);
+            
+            hubConnection.invoke("NotifyOrder", to, orderId);
+            hubConnection.invoke("Send", message, to);
+            axios.post("/messages/" + to, messageModel)
+                .then(res => {
+                    console.log(res.data);
+                })
+                .catch(err => {
+                    console.error(err);
+                    console.error(res.data);
+                })
+                .then(() => {
+
+                });
+        }
+        hubConnection.start();
+    </script>
+}

@@ -1,0 +1,46 @@
+﻿@page
+@model BookShop.UI.Pages.Admin.ConfigureUsersModel
+@{
+}
+
+<div class="columns is-mobile is-centered m-6 ">
+    <div class="column is-6 box has-text-centered has-background-link-light">
+
+        <form method="post" class="align-self-senter">
+            <div class="field">
+                <p class="control">
+                    <label class="label">Логин</label>
+                    <input asp-for="UserInfo.Username" />
+                </p>
+                <span asp-validation-for="UserInfo.Username"></span>
+            </div>
+            <div class="field">
+                <p class="control">
+                    <label class="label">Пароль</label>
+                    <input type="password" asp-for="UserInfo.Password" />
+                </p>
+                <span asp-validation-for="UserInfo.Password"></span>
+            </div>
+            <div class="field">
+                <p class="control">
+                    <label class="label">Email</label>
+                    <input asp-for="UserInfo.Email" />
+                </p>
+                <span asp-validation-for="UserInfo.Email"></span>
+            </div>
+            <div class="field">
+                <button class="button is-success" type="submit">Зарегистрировать</button>
+            </div>
+        </form>
+        @if (!Model.Success)
+        {
+            <p>Пользователь с таким именем уже существует</p>
+        }
+        else
+        {
+
+        }
+
+    </div>
+
+</div>

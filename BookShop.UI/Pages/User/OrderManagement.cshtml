@@ -1,0 +1,135 @@
+﻿@page  "{handler?}"
+@model BookShop.UI.Pages.User.OrderManagementModel
+@{
+}
+<div class="section">
+    <div class="columns is-multiline is-mobile">
+
+        @foreach (var p in Model.Orders)
+        {
+            <div class="column is-3-desktop is-4-tablet is-6-mobile">
+                <a asp-page="/Order" asp-route-id="@p.Id">
+
+                    <div class="card">
+                        <div class="card-image">
+                            <figure class="image is-3by4">
+                                @if (p.Product.Image != null)
+                                {
+                                    <img src="data:image/jpeg;base64,@(Convert.ToBase64String(p.Product.Image))" />
+                                }
+                                else
+                                {
+                                    <img src="~/images/item.jpg" />
+                                }
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            @{
+                                string cssClass = "";
+                                string message = "";
+
+                                if ((int)p.StatusForCustomer == 0)
+                                {
+                                    cssClass = "has-text-link";
+                                    message = "Не получил";
+                                }
+                                else if ((int)p.StatusForCustomer == 1)
+                                {
+                                    cssClass = "has-text-success";
+                                    message = "Получил";
+
+                                }
+                                else if ((int)p.StatusForCustomer == 3)
+                                {
+                                    cssClass = "has-text-danger";
+                                    message = "Отменил";
+
+                                }
+                                else if ((int)p.StatusForCustomer == 4)
+                                {
+                                    cssClass = "has-text-danger";
+                                    message = "Отменил на почте";
+
+                                }
+                            }
+                            @{
+                                string cssClass1 = "";
+                                string message1 = "";
+
+                                if ((int)p.StatusForSeller == 0)
+                                {
+                                    cssClass1 = "has-text-black";
+                                    message1 = "Нет статуса";
+                                }
+                                else if ((int)p.StatusForSeller == 1)
+                                {
+                                    cssClass1 = "has-text-success";
+                                    message1 = "Принял";
+
+                                }
+                                else if ((int)p.StatusForSeller == 2)
+                                {
+                                    cssClass1 = "has-text-link";
+                                    message1 = "Отправил";
+
+                                }
+                                else if ((int)p.StatusForSeller == 3)
+                                {
+                                    cssClass1 = "has-text-success";
+                                    message1 = "Получил деньги";
+
+                                }
+                                else if ((int)p.StatusForCustomer == 4)
+                                {
+                                    cssClass1 = "has-text-danger";
+                                    message1 = "Отменил";
+
+                                }
+                            }
+
+                            <p class="title is-size-5">
+                                @p.Product.Name - @p.Product.Value
+                            </p>
+                            <p class="is-size-7">
+                                @p.Product.Author
+                            </p>
+                            <p class="@cssClass1 is-size-7">
+                                Продавец: @p.Seller<span>(@message1)</span>
+                            </p>
+                            <p class="@cssClass is-size-7">
+                                Покупатель: @p.Customer<span>(@message)</span>
+                            </p>
+                            <p class="is-size-7">
+                                Номер заказа: @p.Id
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        }
+
+
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+
+    <script>
+
+        const hubConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/chat")
+            .build();
+
+        hubConnection.on("ReceiveNotyOrder", function (e) {
+            console.log("я обновляю страницу");
+            setTimeout(function () {
+                window.location.reload(true);
+            }, 200);
+
+        });
+        
+        hubConnection.start();
+    </script>
+}

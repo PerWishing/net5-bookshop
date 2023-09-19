@@ -1,0 +1,181 @@
+﻿@page "{id}"
+@model BookShop.UI.Pages.UpdateProductModel
+@{
+}
+<div class="hero">
+    <div class="hero-body">
+        <h3>Редактирование продукта: @Model.Product.Id</h3>
+        <div class="container">
+            <div class="columns">
+                <div class="column is-6" style="width: 300px;">
+                    <figure class="image is-3by4">
+
+                        @if (Model.Product.Image != null)
+                        {
+                            <img src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.Product.Image))" />
+                        }
+                        else
+                        {
+                            <img src="~/images/item.jpg" />
+                        }
+                    </figure>
+                </div>
+               
+                <div class="column is-6">
+                    <section class="content">
+
+                        <form method="post" class="align-self-senter" enctype="multipart/form-data">
+                            <div class="field" id="app">
+                                <p class="control">
+                                    <label class="label">Обложка книги</label>
+                                </p>
+                                <div id="preview">
+                                    <img v-if="url" :src="url" />
+                                </div>
+                                <input name="image" type="file" @@change="onFileChange" />
+                                <span asp-validation-for="ProductInfo.Name"></span>
+                            </div>
+                            <div class="field">
+                                <p class="control">
+                                    <label class="label">Название книги</label>
+                                    <input asp-for="ProductInfo.Name" value="@Model.Product.Name" />
+
+                                </p>
+                                <span asp-validation-for="ProductInfo.Name"></span>
+                            </div>
+                            <div class="field">
+                                <p class="control">
+                                    <label class="label">Описание книги</label>
+
+                                    <textarea class="textarea is-success" id="@Html.IdFor(m => m.ProductInfo.Description)" name="@Html.NameFor(m => m.ProductInfo.Description)">@Model.Product.Description</textarea>
+
+                                </p>
+                                <span asp-validation-for="ProductInfo.Description"></span>
+                            </div>
+                            <div class="field">
+                                <p class="control">
+                                    <label class="label">Цена</label>
+                                    <input asp-for="ProductInfo.Value" asp-format="{0:N2}" value="@Model.Product.Value.Replace("₽","").Trim()" />
+                                </p>
+                                <span asp-validation-for="ProductInfo.Value"></span>
+                            </div>
+                            <div class="field">
+                                <p class="control">
+                                    <label class="label">Автор</label>
+                                    <input asp-for="ProductInfo.Author" value="@Model.Product.Author" />
+                                </p>
+                                <span asp-validation-for="ProductInfo.Author"></span>
+                            </div>
+                            <div class="field">
+                                <p class="control">
+                                    <label class="label">Жанр</label>
+                                    <select asp-for="ProductInfo.Genre">
+                                        <option value="@null">Выберите жанр</option>
+                                        <option value="1">Художественная литература</option>
+                                        <option value="2">Компьютеры</option>
+                                        <option value="3">Деловая литература</option>
+                                        <option value="4">Наука, образование</option>
+                                        <option value="5">Детская литература</option>
+                                        <option value="6">Семья, дом, дача</option>
+                                        <option value="7">Техника и технология</option>
+                                        <option value="8">Медицина, спорт, здоровье</option>
+                                        <option value="9">Общество, политика, религия</option>
+                                        <option value="10">Специальная и справочная литература</option>
+                                        <option value="11">Искусство, культура</option>
+                                        <option value="12">Хобби, коллекционирование</option>
+                                        <option value="13">Мистика, эзотерика, непознанное</option>
+                                        <option value="14">Разное</option>
+                                    </select>
+                                    <span asp-validation-for="ProductInfo.Genre"></span>
+
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control">
+                                    <label class="label">Издание</label>
+                                    <input asp-for="ProductInfo.Publishing" value="@Model.Product.Publishing" />
+                                </p>
+                                <span asp-validation-for="ProductInfo.Publishing"></span>
+                            </div>
+                            <div class="field">
+                                <p class="control">
+                                    <label class="label">Год издания</label>
+                                    <input asp-for="ProductInfo.Year" value="@Model.Product.Year" />
+                                </p>
+                                <span asp-validation-for="ProductInfo.Year"></span>
+                            </div>
+                            <div class="field">
+                                <p class="control">
+                                    <label class="label">Серия</label>
+                                    <input asp-for="ProductInfo.Series" value="@Model.Product.Series" />
+                                </p>
+                                <span asp-validation-for="ProductInfo.Series"></span>
+                            </div>
+                            <div class="field">
+                                <p class="control">
+                                    <label class="label">ISBN</label>
+                                    <input asp-for="ProductInfo.ISBN" value="@Model.Product.ISBN" />
+                                </p>
+                                <span asp-validation-for="ProductInfo.ISBN"></span>
+                            </div>
+
+                            <div id="appP" class="field">
+                                <p class="control">
+                                    <input class="button is-success" type="submit" asp-page-handler="ForUpdate" value="Сохранить изменения" />
+                                </p>
+                                <p class="control">
+                                    <div v-if="!editing">
+                                        <input class="button is-danger" @@click="deleteProduct" value="Удалить объявление" />
+                                    </div>
+                                    <div v-else>
+                                        <span class="is-danger">Вы действительно хотите удалить объявление?</span>
+                                        <input class="button is-success" type="submit" asp-page-handler="ForDelete" value="Да" />
+                                        <input class="button is-danger" type="button" @@click="cancel" value="Нет" />
+                                    </div>
+                                </p>
+                                <input type="button" class="button" onclick="history.go(-1)" value="Назад" />
+
+                            </div>
+
+                        </form>
+                        <p class="">
+                            Обратите внимание, все поля должны быть заполнены,
+                            в поле цены следует вводить только цифры без знака ",".
+                        </p>
+
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="~/js/user/image.js"></script>
+    <script src="~/js/user/products.js"></script>
+}
+
+<script>
+
+    var toggleStock = function (e) {
+        console.log(e);
+        var stockToHide = document.querySelectorAll('.low-stock');
+
+        stockToHide.forEach(function (e) {
+            e.classList.add('is-hidden');
+        })
+
+        showLowStock(e.target.value);
+    }
+
+    var showLowStock = function (id) {
+        var stockToShow = document.getElementById('low-stock-' + id);
+
+        if (stockToShow !== null && stockToShow !== undefined)
+            stockToShow.classList.remove('is-hidden');
+    }
+
+    showLowStock(document.getElementById('CartViewModel_StockId').value);
+
+</script>

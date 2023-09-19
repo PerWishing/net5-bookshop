@@ -1,0 +1,180 @@
+﻿@page "{id}/{handler?}"
+@model BookShop.UI.Pages.ProductModel
+@inject IAuthorizationService authService
+@{
+}
+
+<div class="hero">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-6" style="width: 300px;">
+                    <figure class="image is-3by4">
+
+                        @if (Model.Product.Image != null)
+                        {
+                            <img src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.Product.Image))" />
+                        }
+                        else
+                        {
+                            <img src="~/images/item.jpg" />
+                        }
+                    </figure>
+                </div>
+                <div class="column is-5 ">
+                    <section class="content">
+                        <p class="title">@Model.Product.Name</p>
+                        <p class="subtitle">Автор: @Model.Product.Author</p>
+                        <p class="">Цена: @Model.Product.Value</p>
+                        <p class="">Жанр: @Model.Product.Genre</p>
+                        <p class="">Издание: @Model.Product.Publishing</p>
+                        <p class="">Год: @Model.Product.Year</p>
+                        <p class="">Серия: @Model.Product.Series</p>
+                        <p class="">ISBN: @Model.Product.ISBN</p>
+                        <p class=""><label>Описание:</label></p>
+                        <div class="box">
+                            <p class=""> @Model.Product.Description</p>
+                        </div>
+
+                        <footer>
+                            <form method="post">
+
+                                @if ((Model.Product.Seller == User.Identity.Name) || (await authService.AuthorizeAsync(User, "Admin")).Succeeded)
+                                {
+                                    <div class="field">
+                                        <div class="control">
+                                            <a asp-page="UpdateProduct" asp-route-id="@Model.Product.Id">Редактировать</a>
+                                        </div>
+                                    </div>
+                                    if (Model.Product.Available == 0)
+                                    {
+                                    <div class="field">
+                                        <div class="control">
+
+                                            <input class="button is-link" type="submit"
+                                                   asp-route-id="@Model.Product.Id" asp-page-handler="ForAvailableClose" value="Снять с продажи">
+                                        </div>
+                                    </div>
+                                    }
+                                    if (Model.Product.Available == 1)
+                                    {
+                                        <div class="field">
+                                            <p>
+                                                Продукт снят с продажи. Вы можете выставить его на продажу снова.
+                                            </p>
+                                        </div>
+                                        <div class="field">
+                                            <div class="control">
+
+                                                <input class="button is-link" type="submit"
+                                                       asp-route-id="@Model.Product.Id" asp-page-handler="ForAvailableOpen" value="Опубликовать снова">
+                                            </div>
+                                        </div>
+                                    }
+
+                                }
+                                else
+                                {
+                                    if (Model.Product.Available == 0 && User.Identity.Name != null || (await authService.AuthorizeAsync(User, "Admin")).Succeeded)
+                                    {
+                                        <div class="field">
+                                            <div class="control">
+                                                <a class="button is-success" asp-page="/Checkout/CustomerInformation" asp-route-id="@Model.Product.Id">Купить</a>
+                                            </div>
+                                        </div>
+                                    }
+                                    if (Model.Product.Available == 1)
+                                    {
+                                        <div class="field">
+                                            <p>
+                                                Продукт не доступен для покупки в данный момент.
+                                            </p>
+                                        </div>
+                                    }
+                                    @if (!Model.AddedInFav && User.Identity.Name != null)
+                                    {
+                                        <div class="field">
+                                            <div class="control">
+                                                <input class="button is-danger" type="submit" asp-page-handler="ForFavor" value="Добавить в избранное">
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if (Model.AddedInFav)
+                                    {
+                                        <p class="is-danger">Вы уже добавили продукт в Избранное</p>
+                                        <div class="field">
+                                            <div class="control">
+                                                <input class="button is-danger" type="submit" asp-page-handler="ForFavorDelete" value="Убрать из Избранного">
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                @if (User.Identity.Name == null)
+                                {
+                                    <div class="field">
+                                        <p>
+                                            Для покупки вам нужно зарегистрироваться.
+                                        </p>
+                                    </div>
+                                }
+                            </form>
+                        </footer>
+                    </section>
+                </div>
+                <div class="column is-5">
+                    <label class="label">
+                        Создатель объявления:
+                    </label>
+                    <div style="width: 200px;">
+                        <a asp-page="/PublicUser" asp-route-name="@Model.Product.Seller">
+                            <p class="box has-text-centered has-background-link-light p-0 m-0 is-shadowless">
+                                @Model.Product.Seller
+
+                            </p>
+                            <div class="box has-text-centered ">
+                                <figure class="image pt-1">
+                                    @if (Model.SellerInfo.Avatar != null)
+                                    {
+                                        <img src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.SellerInfo.Avatar))" />
+                                    }
+                                    else
+                                    {
+                                        <img src="~/images/user-pic.jpg" />
+                                    }
+
+                                </figure>
+
+                            </div>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var toggleStock = function (e) {
+        console.log(e);
+        var stockToHide = document.querySelectorAll('.low-stock');
+
+        stockToHide.forEach(function (e) {
+            e.classList.add('is-hidden');
+        })
+
+        showLowStock(e.target.value);
+    }
+
+    var showLowStock = function (id) {
+        var stockToShow = document.getElementById('low-stock-' + id);
+
+        if (stockToShow !== null && stockToShow !== undefined)
+            stockToShow.classList.remove('is-hidden');
+    }
+
+    showLowStock(document.getElementById('CartViewModel_StockId').value);
+
+</script>

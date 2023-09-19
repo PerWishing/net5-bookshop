@@ -1,0 +1,43 @@
+﻿@page
+@model BookShop.UI.Pages.Accounts.LoginModel
+@{
+}
+
+<div class="columns is-mobile is-centered m-6 ">
+    <div class="column is-3 box has-text-centered has-background-link-light">
+
+        <form method="post" class="align-self-senter">
+            <div class="field">
+                <p class="control">
+                    <label class="label">Логин</label>
+                    <input asp-for="Input.Username" />
+                </p>
+                <span asp-validation-for="Input.Username"></span>
+            </div>
+            <div class="field">
+                <p class="control">
+                    <label class="label">Пароль</label>
+                    <input type="password" asp-for="Input.Password" />
+                </p>
+                <span asp-validation-for="Input.Password"></span>
+            </div>
+
+            <div class="field">
+                <button class="button is-success" type="submit">Вход</button>
+            </div>
+            <div class="field">
+                <a asp-page="/Accounts/Register">Регистрация</a>
+            </div>
+        </form>
+        @if (!Model.Success)
+        {
+            <p>Неверный логин или пароль</p>
+        }
+        @if (Model.Block)
+        {
+            <p class="is-danger">Ваш аккаунт заблокирован. Напишите администратору на почту.</p>
+        }
+
+    </div>
+
+</div>

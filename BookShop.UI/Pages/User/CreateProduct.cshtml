@@ -1,0 +1,120 @@
+﻿@page
+@model BookShop.UI.Pages.User.CreateProductModel
+@{
+}
+    <form method="post" class="align-self-senter" enctype="multipart/form-data" style="width:80%">
+    <p class="title is-size-5">Создание объявления</p>
+    <div class="columns is-multiple is-mobile">
+        <div class="column is-5">
+            <div class="field" id="app">
+                <p class="control">
+                    <label class="label">Обложка книги(3 на 4)</label>
+                </p>
+                <div id="preview">
+                    <figure class="image is-3by4">
+                        <img v-if="url" :src="url" />
+                    </figure>
+                </div>
+                <input name="image" type="file" @@change="onFileChange" />
+                <span asp-validation-for="ProductInfo.Name"></span>
+            </div>
+            <div class="field">
+                <p class="control">
+                    <label class="label">Жанр</label>
+                    <select asp-for="ProductInfo.Genre" style="max-width:300px">
+                        <option value="@null">Выберите жанр</option>
+                        <option value="1">Художественная литература</option>
+                        <option value="2">Компьютеры</option>
+                        <option value="3">Деловая литература</option>
+                        <option value="4">Наука, образование</option>
+                        <option value="5">Детская литература</option>
+                        <option value="6">Семья, дом, дача</option>
+                        <option value="7">Техника и технология</option>
+                        <option value="8">Медицина, спорт, здоровье</option>
+                        <option value="9">Общество, политика, религия</option>
+                        <option value="10">Специальная и справочная литература</option>
+                        <option value="11">Искусство, культура</option>
+                        <option value="12">Хобби, коллекционирование</option>
+                        <option value="13">Мистика, эзотерика, непознанное</option>
+                        <option value="14">Разное</option>
+                    </select>
+                    <span asp-validation-for="ProductInfo.Genre"></span>
+
+                </p>
+            </div>
+        </div>
+            <div class="column is-5">
+                
+                <div class="field">
+                    <p class="control">
+                        <label class="label">Название книги</label>
+                        <input asp-for="ProductInfo.Name" />
+                    </p>
+                    <span asp-validation-for="ProductInfo.Name"></span>
+                </div>
+                <div class="field">
+                    <p class="control">
+                        <label class="label">Описание книги</label>
+                        <textarea class="textarea is-success" asp-for="ProductInfo.Description"></textarea>
+                    </p>
+                    <span asp-validation-for="ProductInfo.Description"></span>
+                </div>
+                <div class="field">
+                    <p class="control">
+                        <label class="label">Цена</label>
+                        <input asp-for="ProductInfo.Value" />
+                    </p>
+                    <span asp-validation-for="ProductInfo.Value"></span>
+                </div>
+                <div class="field">
+                    <p class="control">
+                        <label class="label">Автор</label>
+                        <input asp-for="ProductInfo.Author" />
+                    </p>
+                    <span asp-validation-for="ProductInfo.Author"></span>
+                </div>
+            </div>
+            <div class="column is-5">
+                
+                <div class="field">
+                    <p class="control">
+                        <label class="label">Издание</label>
+                        <input asp-for="ProductInfo.Publishing" />
+                    </p>
+                    <span asp-validation-for="ProductInfo.Publishing"></span>
+                </div>
+                <div class="field">
+                    <p class="control">
+                        <label class="label">Год издания</label>
+                        <input asp-for="ProductInfo.Year" />
+                    </p>
+                    <span asp-validation-for="ProductInfo.Year"></span>
+                </div>
+                <div class="field">
+                    <p class="control">
+                        <label class="label">Серия</label>
+                        <input asp-for="ProductInfo.Series" />
+                    </p>
+                    <span asp-validation-for="ProductInfo.Series"></span>
+                </div>
+                <div class="field">
+                    <p class="control">
+                        <label class="label">ISBN</label>
+                        <input asp-for="ProductInfo.ISBN" />
+                    </p>
+                    <span asp-validation-for="ProductInfo.ISBN"></span>
+                </div>
+
+
+                <div class="field">
+                    <button class="button is-success" type="submit">Создать объявление</button>
+                </div>
+
+            </div>
+
+        </div>
+</form>
+@section scripts{
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="~/js/user/image.js"></script>
+}

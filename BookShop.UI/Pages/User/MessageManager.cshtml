@@ -1,0 +1,65 @@
+﻿@page
+@model BookShop.UI.Pages.User.MessageManagerModel
+@{
+}
+
+<div class="container">
+    <div class="column" style="max-height: 800px; overflow-y: scroll;">
+        @foreach (var m in @Model.MessageInfo)
+        {
+
+
+
+            <div class="box block">
+
+                @if (!(m.Recipient == User.Identity.Name))
+                {
+
+                    @if (m.UserOrAdmin == 1)
+                    {
+                        <p class="has-text-danger">
+                            @m.Recipient
+                        </p>
+                        <a asp-page="/User/CreateMessage" asp-route-name="@m.Recipient">Диалог</a>
+                    }
+                    else
+                    {
+                        <p class="">
+                            @m.Recipient
+                        </p>
+                        <a asp-page="/User/CreateMessage" asp-route-name="@m.Recipient">Диалог</a>
+
+                    }
+                    <p class="is-size-7">Ваше сообщение</p>
+                }
+                else
+                {
+                    @if (m.UserOrAdmin == 1)
+                    {
+                        <p class="has-text-danger">
+                            @m.Sender
+                        </p>
+                        <a asp-page="/User/CreateMessage" asp-route-name="@m.Sender">Диалог</a>
+                    }
+                    else
+                    {
+                        <p class="">
+                            @m.Sender
+                        </p>
+                        <a asp-page="/User/CreateMessage" asp-route-name="@m.Sender">Диалог</a>
+                    }
+                    <p class="is-size-7">Сообщение от @m.Sender</p>
+                }
+
+                <p class="block py-4 pl-2 has-background-link-light">@m.Text</p>
+                <p class="is-size-7">@m.DateOfSend.ToShortDateString()</p>
+            </div>
+
+
+        }
+
+
+
+    </div>
+    
+</div>

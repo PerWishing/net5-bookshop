@@ -1,0 +1,66 @@
+﻿@page
+@model IndexModel
+@{
+}
+
+
+<div class="section">
+    <div class="columns is-multiline is-mobile">
+
+        @{
+
+            foreach (var p in Model.Products)
+            {
+                <div class="column is-3-desktop is-4-tablet is-6-mobile">
+                    <a asp-page="/Product" asp-route-id="@p.Id">
+
+                        <div class="card">
+                            <div class="card-image">
+                                <figure class="image is-3by4">
+                                    @if (p.Image != null)
+                                    {
+                                        <img src="data:image/jpeg;base64,@(Convert.ToBase64String(p.Image))" />
+                                    }
+                                    else
+                                    {
+                                        <img src="~/images/item.jpg" />
+                                    }
+                                </figure>
+                            </div>
+                            <div class="card-content">
+                                @{
+                                    string cssClass = "";
+                                    string message = "";
+
+                                    if (p.Available == 0)
+                                    {
+                                        cssClass = "is-succes";
+                                        message = "Продается";
+                                    }
+                                    else if (p.Available == 1)
+                                    {
+                                        cssClass = "is-danger";
+                                        message = "Снят с продажи";
+
+                                    }
+                                }
+                                <div class="notification is-paddingless has-text-centered @cssClass">
+                                    @message
+                                </div>
+                                    <p class="title is-size-5">
+                                        @p.Name - @p.Value
+                                    </p>
+                                    <p class="subtitle is-size-9">
+                                        Автор: @p.Author
+                                    </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            }
+
+        }
+    </div>
+</div>
+

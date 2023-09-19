@@ -1,0 +1,83 @@
+﻿@page "{name}"
+@model BookShop.UI.Pages.User.CreateMessageModel
+@{
+}
+<div id="appMess" class="container">
+    <div class="column is-8">
+        <input type="hidden" value="@Model.Username" id="name" />
+        <div class="field">
+            <button class="button is-link" @@click="scrollToBottom">Вниз</button>
+        </div>
+        <div id="messageBody" class="block" style="overflow-y: scroll;height: 600px; ">
+
+            <div class="box" v-for="message in messages">
+                <figure class="image" style="width: 50px">
+                    <div v-if="message.avatar">
+                        <img v-bind:src="`${message.avatar}`" />
+                    </div>
+                    <div v-else>
+                        <img src="~/images/user-pic.jpg" />
+                    </div>
+
+                </figure>
+                <div v-if="message.sender != userName">
+                    <p>
+                        <a v-bind:href="'/PublicUser/'+ message.sender">{{message.sender}}(Вы)</a>
+                        - {{formatDate(message.dateOfSend)}}
+                    </p>
+                    <p class="block m-3">{{message.text}}</p>
+                    <div v-if="message.status === 0">
+                        <p class="has-text-grey-light is-size-7 has-text-right">Непрочитано</p>
+                    </div>
+                    <div v-else-if="message.status === 1">
+                        <p class="has-text-success-light is-size-7 has-text-right">Прочитано</p>
+                    </div>
+                </div>
+                <div v-else>
+                    <p>
+                        <a v-bind:href="'/PublicUser/'+ message.sender">{{message.sender}}</a>
+                        - {{formatDate(message.dateOfSend)}}
+                    </p>
+                    <p class="block m-3">{{message.text}}</p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="block">
+
+            <textarea v-model="messageModel.text" class="textarea is-info" placeholder="Сообщение..."></textarea>
+        </div>
+
+        <div class="field">
+            <button class="button is-success" @@click="createMessage">Отправить</button>
+        </div>
+
+    </div>
+    
+</div>
+@section scripts{
+    <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+    
+    <script>
+        const hubConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/chat")
+            .build();
+
+        hubConnection.on("Receive", function (message, to) {
+            console.log("я работаю");
+            
+            console.log("я ещё работаю");
+            setTimeout(function () {
+                window.location.reload(true);
+            }, 100);
+        });
+        function sendMessageToHub(message, to) {
+        hubConnection.invoke("Send", message, to);
+        }
+        hubConnection.start();
+    </script>
+
+    
+    <script src="~/js/user/messages.js"></script>
+}

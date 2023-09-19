@@ -1,0 +1,98 @@
+﻿@page "{p?}/{handler?}/{genre?}"
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+
+<div class="pt-5 pl-0 pr-0 section">
+    
+
+    <div class="columns">
+        <div class="column is-2">
+            <div class="menu">
+                <p class="pl-3 menu-label has-background-link has-text-white">Категории</p>
+
+                <ul class="menu-list has-background-link-light is-size-7">
+                    <li><a asp-page="/Index" asp-page-handler="ForAll">Все категории</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Fiction">Художественная литература</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Cyber">Компьютеры</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Bussines">Деловая литература</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Educ">Наука, образование</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Child">Детская литература</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Personal">Семья, дом, дача</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Moto">Техника и технология</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Health">Медицина, спорт, здоровье</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Politics">Общество, политика, религия</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Ref">Специальная и справочная литература</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Culture">Искусство, культура</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Hobby">Хобби, коллекционирование</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Mistiq">Мистика, эзотерика, непознанное</a></li>
+                    <li><a asp-page="/Index" asp-page-handler="ForGenre" asp-route-genre="Other">Разное</a></li>
+
+                </ul>
+
+            </div>
+        </div>
+        <div class="column is-10">
+            
+            <div class="columns is-multiline is-mobile">
+
+                @foreach (var p in Model.PageInfo.Products)
+                {
+                <div class="column is-3-desktop is-4-tablet is-6-mobile">
+                    <a asp-page="Product" asp-route-id="@p.Id">
+
+                        <div class="card">
+                            <div class="card-image">
+                                <figure class="image is-3by4">
+
+                                    @if (p.Image != null)
+                                    {
+                                        <img src="data:image/jpeg;base64,@(Convert.ToBase64String(p.Image))" />
+                                    }
+                                    else
+                                    {
+                                        <img src="~/images/item.jpg" />
+                                    }
+                                </figure>
+
+                            </div>
+                            <div class="card-content">
+
+                                <p class="title is-size-5">
+                                    @p.Name - @p.Value
+                                </p>
+                                <p class="subtitle is-size-9">
+                                    Автор: @p.Author
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                }
+
+
+            </div>
+            @if (Model.PageInfo.PageViewModel.HasPreviousPage)
+            {
+                <a asp-action="Index" asp-route-genre="@Model.Genre"
+                   asp-route-p="@(Model.PageInfo.PageViewModel.PageNumber - 1)"
+                   class="btn btn-outline-dark">
+                    <i class="glyphicon glyphicon-chevron-left"></i>
+                    Назад
+                </a>
+            }
+            @if (Model.PageInfo.PageViewModel.HasNextPage)
+            {
+                <a asp-action="Index" asp-route-genre="@Model.Genre"
+                   asp-route-p="@(Model.PageInfo.PageViewModel.PageNumber + 1)"
+                   class="btn btn-outline-dark">
+                    Вперед
+                    <i class="glyphicon glyphicon-chevron-right"></i>
+                </a>
+            }
+        </div>
+    </div>
+</div>

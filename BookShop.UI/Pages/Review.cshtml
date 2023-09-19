@@ -1,0 +1,188 @@
+﻿@page "{id}/{handler?}"
+@model BookShop.UI.Pages.ReviewModel
+@{
+}
+<div class="hero">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-4" style="width: 300px;">
+                    <figure class="image is-3by4">
+                        @if (Model.Order.Product.Image != null)
+                        {
+                            <img src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.Order.Product.Image))" />
+                        }
+                        else
+                        {
+                            <img src="~/images/item.jpg" />
+                        }
+                    </figure>
+                </div>
+                <section class="content">
+
+                    <p class="title">@Model.Order.Product.Name</p>
+                    <p class="subtitle">Автор: @Model.Order.Product.Author</p>
+                    <p class="">Цена: @Model.Order.Product.Value</p>
+                    <p class="">Жанр: @Model.Order.Product.Genre</p>
+                    <p class="">Издание: @Model.Order.Product.Publishing</p>
+                    <p class="">Год: @Model.Order.Product.Year</p>
+                    <p class="">Серия: @Model.Order.Product.Series</p>
+                    <p class="">ISBN: @Model.Order.Product.ISBN</p>
+
+                    
+                </section>
+
+
+                <div class="column is-4">
+                    <section class="content">
+                        @if (Model.Order.Seller == User.Identity.Name)
+                        {
+                            <p class="title">Информация о покупателе</p>
+
+                        }
+                        @if (Model.Order.Customer == User.Identity.Name)
+                        {
+                            <p class="title">Информация вашего заказа</p>
+                        }
+                        <p class="subtitle">
+                            Продавец:
+                            <a asp-page="/PublicUser" asp-route-name="@Model.Order.Seller">@Model.Order.Seller</a>
+                        </p>
+                        <p class="subtitle">
+                            Покупатель:
+                            <a asp-page="/PublicUser" asp-route-name="@Model.Order.Customer">@Model.Order.Customer</a>
+                        </p>
+                        <p class="">ФИО покупателя: @Model.Order.FIO</p>
+                        <p class="">Адрес покупателя: @Model.Order.Adress1</p>
+                        <p class="">Телефон покупателя: @Model.Order.PhoneNumber</p>
+                        <p class="">Трек-номер: @Model.Order.TrackNumber</p>
+                        <p class="">
+                            Статус заказа у покупателя @if (Model.Order.Customer == User.Identity.Name)
+                            {<span class="has-text-link-dark">(Вы)</span>} :
+                            @switch ((int)Model.Order.StatusForCustomer)
+                            {
+                                case 0:
+                                    <span class="has-text-danger">Не получен</span>
+
+                                    break;
+                                case 1:
+                                    <span class="has-text-success">Получен</span>
+
+                                    break;
+                                case 2:
+                                    <span class="has-text-warning">Изменён</span>
+
+                                    break;
+                                case 3:
+                                    <span class="has-text-danger">Отменён</span>
+
+                                    break;
+                                default:
+                                    <span class="has-text-danger">@Model.Order.StatusForCustomer</span>
+                                    break;
+                            }
+                        </p>
+                        <p class="">
+                            Статус заказа у продавца @if (Model.Order.Seller == User.Identity.Name)
+                            {<span class="has-text-link-dark">(Вы)</span>}:
+                            @switch ((int)Model.Order.StatusForSeller)
+                            {
+                                case 0:
+                                    <span class="has-text-black">Нет статуса</span>
+
+                                    break;
+                                case 1:
+                                    <span class="has-text-success">Принят</span>
+
+                                    break;
+                                case 2:
+                                    <span class="has-text-link">Отправлен</span>
+
+                                    break;
+                                case 3:
+                                    <span class="has-text-success">Деньги получены</span>
+
+                                    break;
+                                case 4:
+                                    <span class="has-text-danger">Отменён</span>
+
+                                    break;
+                                default:
+                                    <span class="has-text-danger">@Model.Order.StatusForSeller</span>
+                                    break;
+                            }
+                        </p>
+                    </section>
+                    @if (Model.Create)
+                    {
+
+                        <section class="content">
+                            <form method="post">
+
+                                <div class="field">
+                                    <label class="label">
+                                        Отзыв:
+                                    </label>
+                                </div>
+                                <div class="field">
+                                    <textarea class="textarea is-info" placeholder="Ваш отзыв..." 
+                                              id="@Html.IdFor(m => m.ReviewInput.Text)" name="@Html.NameFor(m => m.ReviewInput.Text)"></textarea>
+                                </div>
+                                <div class="field">
+                                    <input class="button is-success" type="submit" asp-page-handler="ForCreate"
+                                           value="Оставить отзыв" />
+                                </div>
+
+                            </form>
+                        </section>
+                    }
+                    else
+                    {
+
+
+                        <section class="content">
+
+                            <div class="field">
+                                @if (Model.ReviewResponse.PositiveOrNegative == 0)
+                                {
+                                    <p class="has-text-success">
+                                        Положительный
+                                    </p>
+                                }
+                                @if (Model.ReviewResponse.PositiveOrNegative == 1)
+                                {
+                                    <p class="has-text-danger">
+                                        Отрицательный
+                                    </p>
+                                }
+                                <p class="">
+                                    Отправитель:
+                                    <a asp-page="/PublicUser" asp-route-name="@Model.ReviewResponse.Sender">@Model.ReviewResponse.Sender</a>
+                                </p>
+                                <p class="">
+                                    Получатель:
+                                    <a asp-page="/PublicUser" asp-route-name="@Model.ReviewResponse.Recipient">@Model.ReviewResponse.Recipient</a>
+                                </p>
+
+
+
+                                <label class="label">
+                                    Отзыв:
+                                </label>
+                            </div>
+                            <div class="field">
+                                <p>
+                                    @Model.ReviewResponse.Text
+                                </p>
+                                <span class="has-text-danger" asp-validation-for="@Model.ReviewInput"></span>
+
+                            </div>
+
+
+                        </section>
+                    }
+                </div>
+            </div>
+                </div>
+            </div>
+    </div>
