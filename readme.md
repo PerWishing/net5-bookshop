@@ -1,3 +1,17 @@
 # .NET 5 AspNet Core MVC BookShop
 
-My first big project that I did at university. Someday I'll do some refactoring :)
+Веб-приложение: интернет-магазин книг «BookShop»
+
+•	MVC, Razor Pages, Vue.js, Bulma
+
+•	Cookie Authorization 
+
+•	Identity
+
+•	IDataProtector для персональных данных в заказе
+
+•	SignalR для чата
+
+•	БД MySql
+
+•	ORM Entity Framework
